@@ -1,59 +1,46 @@
 #!/usr/bin/python3
 """
-The N queens puzzle
+0-nqueens module
 """
+import sys
 
 
-from sys import argv
+if len(sys.argv) > 2 or len(sys.argv) < 2:
+    print("Usage: nqueens N")
+    exit(1)
 
-if __name__ == "__main__":
-    sol = []
-    if len(argv) != 2:
-        print("Usage: nqueens N")
-        exit(1)
-    if argv[1].isdigit() is False:
-        print("N must be a number")
-        exit(1)
-    n = int(argv[1])
-    if n < 4:
-        print("N must be at least 4")
-        exit(1)
+if not sys.argv[1].isdigit():
+    print("N must be a number")
+    exit(1)
 
-    for i in range(n):
-        sol.append([i, None])
+if int(sys.argv[1]) < 4:
+    print("N must be at least 4")
+    exit(1)
 
-    def already_exists(y):
-        """check that a queen does not already exist in that y value"""
-        for x in range(n):
-            if y == sol[x][1]:
-                return True
-        return False
+n = int(sys.argv[1])
 
-    def reject(x, y):
-        """determines whether or not to reject the solution"""
-        if (already_exists(y)):
-            return False
-        i = 0
-        while (i < x):
-            if abs(sol[i][1] - y) == abs(i - x):
-                return False
+
+def queens(n, i=0, a=[], b=[], c=[]):
+    """Finds the possible positions
+    """
+    if i < n:
+        for j in range(n):
+            if j not in a and i + j not in b and i - j not in c:
+                yield from queens(n, i + 1, a + [j], b + [i + j], c + [i - j])
+    else:
+        yield a
+
+
+def solve(n):
+    """ solve """
+    k = []
+    i = 0
+    for solution in queens(n, 0):
+        for s in solution:
+            k.append([i, s])
             i += 1
-        return True
+        print(k)
+        k = []
+        i = 0
 
-    def clear_a(x):
-        """clears the answers from the point of failure on"""
-        for i in range(x, n):
-            sol[i][1] = None
-
-    def nqueens(x):
-        """recursive backtracking function to find the solution"""
-        for y in range(n):
-            clear_a(x)
-            if reject(x, y):
-                sol[x][1] = y
-                if (x == n - 1):
-                    print(sol)
-                else:
-                    nqueens(x + 1)
-
-    nqueens(0)
+solve(n)
